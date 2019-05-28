@@ -1,17 +1,17 @@
 python train.py \
     --caption_model topdown \
-    --input_json data/paratalk.json \
-    --input_fc_dir data/parabu_fc \
-    --input_att_dir data/parabu_att \
-    --input_label_h5 data/paratalk_label.h5 \
+    --input_json './data/seqtalk.json' \
+    --input_fc_dir './data/data/adebu_fc' \
+    --input_att_dir './data/data/adebu_att' \
+    --input_label_h5 './data/seqtalk_label.h5' \
     --batch_size 10 \
     --learning_rate 5e-5 \
     --learning_rate_decay_start 0 \
     --scheduled_sampling_start 0 \
-    --save_checkpoint_every 4000 \
+    --save_checkpoint_every 9074 \
     --language_eval 1 \
-    --val_images_use 5000 \
-    --max_epochs 200 \
+    --val_images_use 400 \
+    --max_epochs 25 \
     --self_critical_after 0 \
     --cached_tokens para-train-idxs \
     --cider_reward_weight 1 \

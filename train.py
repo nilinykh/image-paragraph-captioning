@@ -113,6 +113,7 @@ def train(opt):
         # Load data from train split (0)
         start = time.time()
         data = loader.get_batch('train')
+  #      print(data)
         data_time = time.time() - start
         start = time.time()
 
@@ -151,6 +152,8 @@ def train(opt):
 
         # Update the iteration and epoch
         iteration += 1
+        #print(iteration)
+        #print(opt.save_checkpoint_every)
         if data['bounds']['wrapped']:
             epoch += 1
             update_lr_flag = True
@@ -167,8 +170,11 @@ def train(opt):
             ss_prob_history[iteration] = model.ss_prob
 
         # Validate and save model 
+#        print('epoch', epoch)
+ #       print(iteration, opt.save_checkpoint_every)
         if (iteration % opt.save_checkpoint_every == 0):
 
+#        if iteration == 8750
             # Evaluate model
             eval_kwargs = {'split': 'val',
                             'dataset': opt.input_json}

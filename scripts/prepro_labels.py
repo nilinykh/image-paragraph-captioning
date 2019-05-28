@@ -165,13 +165,13 @@ if __name__ == "__main__":
 
   # input json
   parser.add_argument('--input_json', required=True, help='input json file to process into hdf5')
-  parser.add_argument('--output_json', default='data.json', help='output json file')
-  parser.add_argument('--output_h5', default='data', help='output h5 file')
+  parser.add_argument('--output_json', default='seq.json', help='output json file')
+  parser.add_argument('--output_h5', default='seq', help='output h5 file')
   parser.add_argument('--images_root', default='', help='root location in which images are stored, to be prepended to file_path in input json')
 
   # options
   parser.add_argument('--max_length', default=175, type=int, help='max length of a caption, in number of words. captions longer than this get clipped.')
-  parser.add_argument('--word_count_threshold', default=4, type=int, help='only words that occur more than this number of times will be put in vocab')
+  parser.add_argument('--word_count_threshold', default=1, type=int, help='only words that occur more than this number of times will be put in vocab')
 
   args = parser.parse_args()
   params = vars(args) # convert to ordinary dict

@@ -66,18 +66,24 @@ class DataLoader(data.Dataset):
         self.num_images = self.label_start_ix.shape[0]
         print('read %d image features' %(self.num_images))
 
+        nope = [10471, 10452, 10669, 2861, 6965, 2844, 5709, 5706, 14970, 5767, 10748, 101481, 101522, 11378, 8467, 5711, \
+10484, 101963, 10644, 919, 2570, 922, 815, 10228, 101713, 10592, 8394, 10383, 10400, 11215, 101966, 101987, 101969, 101967, 101970, 101971, \
+6995, 2856]
+
         # separate out indexes for each of the provided splits
         self.split_ix = {'train': [], 'val': [], 'test': []}
         for ix in range(len(self.info['images'])):
             img = self.info['images'][ix]
-            if img['split'] == 'train':
-                self.split_ix['train'].append(ix)
-            elif img['split'] == 'val':
-                self.split_ix['val'].append(ix)
-            elif img['split'] == 'test':
-                self.split_ix['test'].append(ix)
-            elif opt.train_only == 0: # restval
-                self.split_ix['train'].append(ix)
+            #print(img['id'])
+            if img['id'] not in nope and img['id'] != 1948:
+                if img['split'] == 'train':
+                    self.split_ix['train'].append(ix)
+                elif img['split'] == 'val':
+                    self.split_ix['val'].append(ix)
+                elif img['split'] == 'test':
+                    self.split_ix['test'].append(ix)
+                elif opt.train_only == 0: # restval
+                    self.split_ix['train'].append(ix)
 
         print('assigned %d images to split train' %len(self.split_ix['train']))
         print('assigned %d images to split val' %len(self.split_ix['val']))
@@ -119,8 +125,8 @@ class DataLoader(data.Dataset):
         batch_size = batch_size or self.batch_size
         seq_per_img = seq_per_img or self.seq_per_img
 
-        fc_batch = [] # np.ndarray((batch_size * seq_per_img, self.opt.fc_feat_size), dtype = 'float32')
-        att_batch = [] # np.ndarray((batch_size * seq_per_img, 14, 14, self.opt.att_feat_size), dtype = 'float32')
+        fc_batch = [] #np.ndarray((batch_size * seq_per_img, self.opt.fc_feat_size), dtype = 'float32')
+        att_batch = [] #np.ndarray((batch_size * seq_per_img, 14, 14, self.opt.att_feat_size), dtype = 'float32')
         label_batch = np.zeros([batch_size * seq_per_img, self.seq_length + 2], dtype = 'int')
         mask_batch = np.zeros([batch_size * seq_per_img, self.seq_length + 2], dtype = 'float32')
 
@@ -148,6 +154,7 @@ class DataLoader(data.Dataset):
             info_dict = {}
             info_dict['ix'] = ix
             info_dict['id'] = self.info['images'][ix]['id']
+            #print('IMAGE ID', self.info['images'][ix]['id'])
             info_dict['file_path'] = self.info['images'][ix]['file_path']
             infos.append(info_dict)
 
@@ -157,12 +164,18 @@ class DataLoader(data.Dataset):
         fc_batch, att_batch, label_batch, gts, infos = \
             zip(*sorted(zip(fc_batch, att_batch, np.vsplit(label_batch, batch_size), gts, infos), key=lambda x: 0, reverse=True))
         data = {}
+
+        #for _ in fc_batch:
+        #    print('underscore sign', _)
+        #    print('its shape', _.shape)
+
         data['fc_feats'] = np.stack(reduce(lambda x,y:x+y, [[_]*seq_per_img for _ in fc_batch]))
         # merge att_feats
         max_att_len = max([_.shape[0] for _ in att_batch])
         data['att_feats'] = np.zeros([len(att_batch)*seq_per_img, max_att_len, att_batch[0].shape[1]], dtype = 'float32')
         for i in range(len(att_batch)):
             data['att_feats'][i*seq_per_img:(i+1)*seq_per_img, :att_batch[i].shape[0]] = att_batch[i]
+
         data['att_masks'] = np.zeros(data['att_feats'].shape[:2], dtype='float32')
         for i in range(len(att_batch)):
             data['att_masks'][i*seq_per_img:(i+1)*seq_per_img, :att_batch[i].shape[0]] = 1
@@ -189,10 +202,12 @@ class DataLoader(data.Dataset):
     def __getitem__(self, index):
         """This function returns a tuple that is further passed to collate_fn
         """
+
         ix = index #self.split_ix[index]
         if self.use_att:
             att_feat = np.load(os.path.join(self.input_att_dir, str(self.info['images'][ix]['id']) + '.npz'))['feat']
             # Reshape to K x C
+            #print(self.info['images'][ix]['id'], 'FEATS', att_feat.shape)
             att_feat = att_feat.reshape(-1, att_feat.shape[-1])
             if self.norm_att_feat:
                 att_feat = att_feat / np.linalg.norm(att_feat, 2, 1, keepdims=True)

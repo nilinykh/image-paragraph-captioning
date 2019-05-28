@@ -1,17 +1,19 @@
 python train.py \
     --batch_size 10 \
-    --input_att_dir 'data/parabu_att' \
-    --input_fc_dir 'data/parabu_fc' \
-    --input_json 'data/paratalk.json' \
-    --input_label_h5 'data/paratalk_label.h5' \
+    --input_att_dir './data/data/adebu_att' \
+    --input_fc_dir './data/data/adebu_fc' \
+    --input_json './data/seqtalk.json' \
+    --input_label_h5 './data/seqtalk_label.h5' \
     --language_eval 1 \
     --learning_rate 5e-4 \
     --learning_rate_decay_start 0 \
     --scheduled_sampling_start 0 \
-    --max_epochs 30 \
+    --max_epochs 25 \
     --rnn_type 'lstm' \
-    --val_images_use 5000 \
-    --save_checkpoint_every 3000 \
+    --val_images_use 400 \
+    --save_checkpoint_every 9074 \
     --checkpoint_path 'log_xe/' \
     --id 'xe' \
-    --print_freq 200
+    --print_freq 100 \
+    --fc_feat_size 4096 \
+    --att_feat_size 512

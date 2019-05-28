@@ -11,10 +11,10 @@ data = '../data/captions/'
 
 # Files
 example_json = os.path.join(data, 'captions_val2014.json')
-para_json = os.path.join(data, 'paragraphs_v1.json')
-train_split = os.path.join(data, 'train_split.json')
-val_split = os.path.join(data, 'val_split.json')
-test_split = os.path.join(data, 'test_split.json')
+para_json = os.path.join(data, 'sequence_v1.json')
+train_split = os.path.join(data, 'ade_train_split.json')
+val_split = os.path.join(data, 'ade_val_split.json')
+test_split = os.path.join(data, 'ade_test_split.json')
 
 # Load data
 example_json = json.load(open(example_json))
@@ -25,14 +25,16 @@ test_split = json.load(open(test_split))
 
 # Helper function to get train/val/test split
 def get_split(id):
-    if id in train_split:
-        return 'train'
-    elif id in val_split:
-        return 'val'
-    elif id in test_split:
-        return 'test'
-    else:
-        raise Exception('id not found in train/val/test')
+    if id != 1948:
+        if id in train_split:
+            return 'train'
+        elif id in val_split:
+            return 'val'
+        elif id in test_split:
+            return 'test'
+        else:
+            print(id)
+            raise Exception('id not found in train/val/test')
 
 # Tokenize the paragraphs and reformat them to a JSON file
 # with the same format as the Karpathy MS COCO JSON file
@@ -101,7 +103,7 @@ def tokenize_and_reformat(para_json):
 if __name__ == '__main__':
     print('This will take a couple of minutes.')
     paragraph_json = tokenize_and_reformat(para_json)
-    outfile = os.path.join(data, 'para_karpathy_format.json')
+    outfile = os.path.join(data, 'seq_karpathy_format.json')
     with open(outfile, 'w') as f:
         json.dump(paragraph_json, f)
 

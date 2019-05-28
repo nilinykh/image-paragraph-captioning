@@ -3,21 +3,21 @@ import sys, os
 import json
 
 # Caption data directory
-data = 'data/captions/'
+data = '../data/captions/'
 
 # Files
 example_json = os.path.join(data, 'captions_val2014.json')
-para_json = os.path.join(data, 'paragraphs_v1.json')
-train_split = os.path.join(data, 'train_split.json')
-val_split = os.path.join(data, 'val_split.json')
-test_split = os.path.join(data, 'test_split.json')
+para_json = os.path.join(data, 'sequence_v1.json')
+train_split = os.path.join(data, 'ade_train_split.json')
+val_split = os.path.join(data, 'ade_val_split.json')
+test_split = os.path.join(data, 'ade_test_split.json')
 
 # Output files (should be coco-caption directory)
-coco_captions = 'coco-caption/annotations/' 
+coco_captions = '../coco-caption/annotations/' 
 train_outfile = os.path.join(coco_captions, 'para_captions_train.json')
 val_outfile = os.path.join(coco_captions, 'para_captions_val.json')
 test_outfile = os.path.join(coco_captions, 'para_captions_test.json')
-assert os.path.exists(coco_captions)
+#assert os.path.exists(coco_captions)
 
 # Load data
 example_json = json.load(open(example_json))

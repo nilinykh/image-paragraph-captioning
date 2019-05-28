@@ -42,6 +42,9 @@ def pad_unsort_packed_sequence(input, inv_ix):
 def pack_wrapper(module, att_feats, att_masks):
     if att_masks is not None:
         packed, inv_ix = sort_pack_padded_sequence(att_feats, att_masks.data.long().sum(1))
+        #print(packed[0], packed[0].shape)
+        #print(packed[1], packed[1].shape)
+        #print('inv ix', inv_ix)
         return pad_unsort_packed_sequence(PackedSequence(module(packed[0]), packed[1]), inv_ix)
     else:
         return module(att_feats)
@@ -53,10 +56,12 @@ class AttModel(CaptionModel):
         self.input_encoding_size = opt.input_encoding_size
         #self.rnn_type = opt.rnn_type
         self.rnn_size = opt.rnn_size
+        #self.rnn_size = 512
         self.num_layers = opt.num_layers
         self.drop_prob_lm = opt.drop_prob_lm
         self.seq_length = opt.seq_length
         self.fc_feat_size = opt.fc_feat_size
+        #self.fc_feat_size = 4096
         self.att_feat_size = opt.att_feat_size
         self.att_hid_size = opt.att_hid_size
 
@@ -67,9 +72,12 @@ class AttModel(CaptionModel):
         self.embed = nn.Sequential(nn.Embedding(self.vocab_size + 1, self.input_encoding_size),
                                 nn.ReLU(),
                                 nn.Dropout(self.drop_prob_lm))
+        #print(self.fc_feat_size, self.rnn_size)
+
         self.fc_embed = nn.Sequential(nn.Linear(self.fc_feat_size, self.rnn_size),
                                     nn.ReLU(),
                                     nn.Dropout(self.drop_prob_lm))
+
         self.att_embed = nn.Sequential(*(
                                     ((nn.BatchNorm1d(self.att_feat_size),) if self.use_bn else ())+
                                     (nn.Linear(self.att_feat_size, self.rnn_size),
@@ -102,6 +110,8 @@ class AttModel(CaptionModel):
 
         # embed fc and att feats
         fc_feats = self.fc_embed(fc_feats)
+        #print(fc_feats.shape)
+    #    print(att_feats.shape)
         att_feats = pack_wrapper(self.att_embed, att_feats, att_masks)
 
         # Project the attention feats first to reduce memory and computation comsumptions.
@@ -110,6 +120,9 @@ class AttModel(CaptionModel):
         return fc_feats, att_feats, p_att_feats
 
     def _forward(self, fc_feats, att_feats, seq, att_masks=None):
+
+        #print(fc_feats.shape, att_feats.shape, seq.shape)
+
         att_feats, att_masks = self.clip_att(att_feats, att_masks)
 
         batch_size = fc_feats.size(0)
