@@ -112,6 +112,8 @@ ignore = ["id", "batch_size", "beam_size", "start_from", "language_eval", "block
 for k in vars(infos['opt']).keys():
     if k not in ignore:
         if k in vars(opt):
+#            print('K', k)
+#            print(vars(opt)[k], vars(infos['opt'])[k])
             assert vars(opt)[k] == vars(infos['opt'])[k], k + ' option not consistent'
         else:
             vars(opt).update({k: vars(infos['opt'])[k]}) # copy over options from model
