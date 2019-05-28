@@ -91,14 +91,24 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    ade_img = pd.read_json(args.img_df, orient='split', compression='gzip')
+    ade_obj = pd.read_json(args.obj_df, orient='split', compression='gzip') 
+    image_features = np.load(args.feats)['arr_0']
+    
+
+
     splits = build_split(args.splits, args.split_type)
-    res_obj_dataframe = objects_to_keep(args.feats, splits, args.obj_df)
+    res_obj_dataframe = objects_to_keep(image_features, splits, ade_obj)
+    this_file_split = str(args.split_type)
+
+    print('Working on the', args.split_type, 'set...')
 
     # generate tsv
-    with open(f'./{args.split_type}.tsv', 'ab') as tsvfile:
+    with open("./{}.tsv".format(this_file_split), 'ab') as tsvfile:
         writer = csv.DictWriter(tsvfile, delimiter='\t', fieldnames=FIELDNAMES)
         for img in splits:
             # check image 1948
             if img != 1948:
                 #print(img)
-                writer.writerow(get_detection_from_images(res_obj_dataframe, args.img_df, args.feats, args.image_path, img))
+                writer.writerow(get_detection_from_images(res_obj_dataframe, ade_img, image_features, args.image_path, img))
+    print('Done with', args.split_type, 'set!')
